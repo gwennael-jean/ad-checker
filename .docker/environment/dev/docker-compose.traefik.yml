@@ -1,48 +1,62 @@
 version: '3.0'
 services:
-    database:
-        labels:
-            - traefik.enable=false
+  database:
+    labels:
+      - traefik.enable=false
 
-    php:
-        depends_on:
-            - database
-            - smtp
-        labels:
-            - traefik.enable=false
+  php:
+    depends_on:
+      - database
+      - smtp
+    labels:
+      - traefik.enable=false
 
-    httpd:
-        labels:
-            - traefik.enable=true
-            - traefik.http.routers.ad_checker_httpd.rule=Host(`ad-checker.local`)
-            - traefik.http.routers.ad_checker_httpd.entryPoints=web
+  httpd:
+    labels:
+      - traefik.http.routers.ad_checker.rule=Host(`ad-checker.traefik.me`)
+      - traefik.http.routers.ad_checker-tls.tls.domains[0].main=ad-checker.traefik.me
+      - traefik.http.routers.ad_checker-tls.tls.domains[0].sans=ad-checker-*.traefik.me
+      - traefik.http.routers.ad_checker.tls=true
 
-    phpmyadmin:
-        image: phpmyadmin/phpmyadmin
-        depends_on:
-            - database
-        environment:
-            - PMA_HOST=database
-        labels:
-            - traefik.enable=true
-            - traefik.http.routers.ad_checker_phpmyadmin.rule=Host(`phpmyadmin.ad-checker.local`)
-            - traefik.http.routers.ad_checker_phpmyadmin.entryPoints=web
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - database
+    environment:
+      - PMA_HOST=database
+    labels:
+      - traefik.http.routers.phpmyadmin_ad_checker.rule=Host(`phpmyadmin.ad-checker.traefik.me`)
+      - traefik.http.routers.phpmyadmin_ad_checker-tls.tls.domains[0].main=phpmyadmin.ad-checker.traefik.me
+      - traefik.http.routers.phpmyadmin_ad_checker-tls.tls.domains[0].sans=phpmyadmin.ad-checker-*.traefik.me
+      - traefik.http.routers.phpmyadmin_ad_checker.tls=true
 
-    smtp:
-        image: djfarrelly/maildev
-        restart: always
-        labels:
-            - traefik.enable=true
-            - traefik.http.routers.ad_checker_maildev.rule=Host(`maildev.ad-checker.local`)
-            - traefik.http.routers.ad_checker_maildev.entryPoints=web
-            - traefik.http.services.ad_checker_maildev.loadbalancer.server.port=80
+  smtp:
+    image: djfarrelly/maildev
+    restart: always
+    labels:
+      - traefik.http.routers.maildev_ad_checker.rule=Host(`maildev.ad-checker.traefik.me`)
+      - traefik.http.routers.maildev_ad_checker-tls.tls.domains[0].main=maildev.ad-checker.traefik.me
+      - traefik.http.routers.maildev_ad_checker-tls.tls.domains[0].sans=maildev.ad-checker-*.traefik.me
+      - traefik.http.routers.maildev_ad_checker.tls=true
 
-    traefik:
-        image: traefik:v2.3
-        ports:
-            - 80:80
-            - 8080:8080
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
-            - ./dockerfiles/traefik/traefik.toml:/etc/traefik/traefik.toml
-            - ./dockerfiles/traefik/acme.json:/acme.json
+  traefik:
+    restart: unless-stopped
+    image: traefik:v2.3
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./dockerfiles/traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./dockerfiles/traefik/tls.yml:/etc/traefik/tls.yml
+      - ./dockerfiles/traefik/certs:/etc/ssl/traefik
+
+  reverse-proxy-https-helper:
+    image: alpine
+    command: sh -c "cd /etc/ssl/traefik
+      && wget traefik.me/cert.pem -O cert.pem
+      && wget traefik.me/privkey.pem -O privkey.pem"
+    volumes:
+      - ./dockerfiles/traefik/certs:/etc/ssl/traefik
