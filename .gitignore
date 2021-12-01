@@ -1,0 +1,32 @@
+###> IDE ###
+/.idea/
+/nbproject/
+###< IDE ###
+
+###> Docker ###
+/.docker/.env
+/.docker/dockerfiles/database/data/
+/.docker/dockerfiles/database/import/
+/.bash_history
+###< Docker ###
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> Composer ###
+.composer/
+###< Composer ###
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/public/build/
+npm-debug.log
+yarn-error.log
+###< symfony/webpack-encore-bundle ###
