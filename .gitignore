@@ -7,6 +7,7 @@
 /.docker/.env
 /.docker/dockerfiles/database/data/
 /.docker/dockerfiles/database/import/
+/.docker/dockerfiles/traefik/certs/
 /.bash_history
 ###< Docker ###
 
