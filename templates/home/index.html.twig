@@ -5,3 +5,33 @@
 {% block body %}
 
 {% endblock %}
+
+{% block javascripts %}
+    <script>
+        function check() {
+            setInterval(() => {
+                fetch('/checker/chocobonplan/ps5').then(function (response) {
+                    // var notification = new Notification('New AD', {
+                    //     body: 'You have a new AD'
+                    // });
+                });
+            }, 5000);
+        }
+
+        switch (Notification.permission) {
+            case "default":
+                Notification.requestPermission()
+                    .then(function (permission) {
+                        if (permission === "granted") {
+                            check();
+                        }
+                    });
+                break;
+            case "granted":
+                check();
+                break;
+            case "denied":
+                break;
+        }
+    </script>
+{% endblock %}
