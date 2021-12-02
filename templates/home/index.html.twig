@@ -10,12 +10,16 @@
     <script>
         function check() {
             setInterval(() => {
-                fetch('/checker/chocobonplan/ps5').then(function (response) {
-                    // var notification = new Notification('New AD', {
-                    //     body: 'You have a new AD'
-                    // });
-                });
-            }, 5000);
+                fetch('/checker/chocobonplan/ps5')
+                    .then((response) => response.json())
+                    .then(function (data) {
+                        if (data.sendNotification) {
+                            new Notification(data.title, {
+                                body: data.body
+                            });
+                        }
+                    });
+            }, 10000);
         }
 
         switch (Notification.permission) {

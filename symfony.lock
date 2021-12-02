@@ -53,11 +53,17 @@
             "./bin/console"
         ]
     },
+    "symfony/css-selector": {
+        "version": "v6.0.0"
+    },
     "symfony/dependency-injection": {
         "version": "v6.0.0"
     },
     "symfony/deprecation-contracts": {
         "version": "v3.0.0"
+    },
+    "symfony/dom-crawler": {
+        "version": "v6.0.0"
     },
     "symfony/dotenv": {
         "version": "v6.0.0"
@@ -107,6 +113,12 @@
             "./src/Controller/.gitignore",
             "./src/Kernel.php"
         ]
+    },
+    "symfony/http-client": {
+        "version": "v6.0.0"
+    },
+    "symfony/http-client-contracts": {
+        "version": "v3.0.0"
     },
     "symfony/http-foundation": {
         "version": "v6.0.0"
