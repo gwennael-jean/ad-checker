@@ -5,3 +5,37 @@
 {% block body %}
 
 {% endblock %}
+
+{% block javascripts %}
+    <script>
+        function check() {
+            setInterval(() => {
+                fetch('/checker/chocobonplan/ps5')
+                    .then((response) => response.json())
+                    .then(function (data) {
+                        if (data.sendNotification) {
+                            new Notification(data.title, {
+                                body: data.body
+                            });
+                        }
+                    });
+            }, 10000);
+        }
+
+        switch (Notification.permission) {
+            case "default":
+                Notification.requestPermission()
+                    .then(function (permission) {
+                        if (permission === "granted") {
+                            check();
+                        }
+                    });
+                break;
+            case "granted":
+                check();
+                break;
+            case "denied":
+                break;
+        }
+    </script>
+{% endblock %}
